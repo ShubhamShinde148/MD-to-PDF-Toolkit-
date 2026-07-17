@@ -5,6 +5,7 @@
 [![Flask](https://img.shields.io/badge/Flask-3-green.svg)](https://flask.palletsprojects.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-cyan.svg)](https://tailwindcss.com/)
 <img width="1919" height="972" alt="image" src="https://github.com/user-attachments/assets/805e0474-d74a-4792-812a-c923eb616d62" />
+<img width="1919" height="896" alt="image" src="https://github.com/user-attachments/assets/3489fd53-8bcd-4986-bbd5-fd9fa6ee54c1" />
 
 A world-class, premium Markdown Studio capable of writing, live previewing, converting, and exporting Markdown documents into beautifully styled, print-ready PDF and HTML documents. 
 
@@ -26,6 +27,8 @@ Designed with an elegant Obsidian + Figma inspired interface, **MD Catalyst Pro*
   - *Additional options include customized margins, papers (A4, Letter), watermarks, and automated page numbers.*
 
 ---
+<img width="1919" height="900" alt="image" src="https://github.com/user-attachments/assets/a703688c-5054-4b23-8c0f-6996259429af" />
+
 
 ## 🛠️ Tech Stack
 
