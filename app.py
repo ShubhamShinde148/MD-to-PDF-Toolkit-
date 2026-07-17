@@ -326,13 +326,16 @@ class CustomMarkdownPdf(MarkdownPdf):
         return html
 
     def _make_doc(self):
-        self.writer.write(self.out_file)
         self.writer.close()
+        self.out_file.seek(0)
         try:
             doc = fitz.Story.add_pdf_links(self.out_file, self.hrefs)
         except RuntimeError as e:
             print(f"Warning: Failed to add PDF links: {e}. Falling back to opening PDF without links.")
             doc = fitz.open(self.out_file)
+        doc.set_metadata(self.meta)
+        if self.toc_level > 0:
+            doc.set_toc(self.toc)
         return doc
 
     def save(self, file_name, watermark_text=None, has_cover_page=False, show_page_numbers=True):
