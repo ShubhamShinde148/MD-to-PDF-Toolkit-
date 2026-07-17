@@ -4,6 +4,7 @@
 [![React](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
 [![Flask](https://img.shields.io/badge/Flask-3-green.svg)](https://flask.palletsprojects.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-cyan.svg)](https://tailwindcss.com/)
+<img width="1919" height="972" alt="image" src="https://github.com/user-attachments/assets/805e0474-d74a-4792-812a-c923eb616d62" />
 
 A world-class, premium Markdown Studio capable of writing, live previewing, converting, and exporting Markdown documents into beautifully styled, print-ready PDF and HTML documents. 
 
