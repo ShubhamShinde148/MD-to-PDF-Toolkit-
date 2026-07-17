@@ -28,7 +28,7 @@ export const WelcomeScreen: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[85vh] text-center p-6 select-none relative overflow-hidden">
+    <div className="flex-1 flex flex-col items-center justify-center text-center p-6 select-none relative overflow-hidden h-full w-full">
       {/* Background glow effects */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-accent-primary opacity-[0.06] rounded-full blur-[80px] pointer-events-none" />
       <div className="absolute bottom-10 left-1/3 w-[300px] h-[300px] bg-accent-secondary opacity-[0.04] rounded-full blur-[60px] pointer-events-none" />
