@@ -298,6 +298,65 @@ def highlight_code(code, name, attrs):
     except Exception:
         return ""
 
+from docx import Document
+from docx.shared import Inches, Pt, RGBColor
+
+def parse_styled_text(paragraph, text):
+    parts = re.split(r'(\*\*.*?\*\*|`.*?`)', text)
+    for part in parts:
+        if part.startswith("**") and part.endswith("**"):
+            run = paragraph.add_run(part[2:-2])
+            run.bold = True
+        elif part.startswith("`") and part.endswith("`"):
+            run = paragraph.add_run(part[1:-1])
+            run.font.name = 'Courier New'
+            run.font.size = Pt(10)
+            run.font.color.rgb = RGBColor(0x7c, 0x3a, 0xed)
+        else:
+            paragraph.add_run(part)
+
+def convert_md_to_docx(markdown_text, docx_path):
+    doc = Document()
+    style = doc.styles['Normal']
+    font = style.font
+    font.name = 'Arial'
+    font.size = Pt(11)
+    font.color.rgb = RGBColor(0x33, 0x41, 0x55)
+    
+    lines = markdown_text.splitlines()
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+            
+        if stripped.startswith("# "):
+            doc.add_heading(stripped[2:], level=1)
+            continue
+        elif stripped.startswith("## "):
+            doc.add_heading(stripped[3:], level=2)
+            continue
+        elif stripped.startswith("### "):
+            doc.add_heading(stripped[4:], level=3)
+            continue
+        elif stripped.startswith("> "):
+            blockquote_text = stripped[2:].replace("[!NOTE]", "").replace("[!TIP]", "").replace("[!WARNING]", "").replace("[!CAUTION]", "").strip()
+            p = doc.add_paragraph()
+            p.paragraph_format.left_indent = Inches(0.5)
+            run = p.add_run(blockquote_text)
+            run.italic = True
+            run.font.color.rgb = RGBColor(0x7c, 0x3a, 0xed)
+            continue
+        elif stripped.startswith("* ") or stripped.startswith("- "):
+            item_text = stripped[2:].strip()
+            p = doc.add_paragraph(style='List Bullet')
+            parse_styled_text(p, item_text)
+            continue
+            
+        p = doc.add_paragraph()
+        parse_styled_text(p, stripped)
+        
+    doc.save(docx_path)
+
 class CustomMarkdownPdf(MarkdownPdf):
     """Subclass of MarkdownPdf to post-process standard HTML rendering output for custom styling."""
     
@@ -333,9 +392,17 @@ class CustomMarkdownPdf(MarkdownPdf):
         except RuntimeError as e:
             print(f"Warning: Failed to add PDF links: {e}. Falling back to opening PDF without links.")
             doc = fitz.open("pdf", self.out_file.getvalue())
-        doc.set_metadata(self.meta)
-        if self.toc_level > 0:
-            doc.set_toc(self.toc)
+        try:
+            doc.set_metadata(self.meta)
+        except Exception as e:
+            print(f"Warning: Failed to set metadata: {e}")
+
+        try:
+            if self.toc_level > 0 and self.toc:
+                doc.set_toc(self.toc)
+        except Exception as e:
+            print(f"Warning: Failed to set Table of Contents: {e}")
+
         return doc
 
     def save(self, file_name, watermark_text=None, has_cover_page=False, show_page_numbers=True):
@@ -520,6 +587,33 @@ pre code span {
                 as_attachment=True,
                 download_name="document.html",
                 mimetype="text/html"
+            )
+
+        elif output_format == "docx":
+            with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as temp_docx:
+                temp_docx_path = temp_docx.name
+            try:
+                convert_md_to_docx(markdown_text, temp_docx_path)
+                return send_file(
+                    temp_docx_path,
+                    as_attachment=True,
+                    download_name="document.docx",
+                    mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                )
+            except Exception as e:
+                if os.path.exists(temp_docx_path):
+                    os.unlink(temp_docx_path)
+                raise e
+
+        elif output_format == "markdown":
+            with tempfile.NamedTemporaryFile(suffix=".md", delete=False, mode="w", encoding="utf-8") as temp_md:
+                temp_md.write(markdown_text)
+                temp_md_path = temp_md.name
+            return send_file(
+                temp_md_path,
+                as_attachment=True,
+                download_name="document.md",
+                mimetype="text/markdown"
             )
 
         else:
