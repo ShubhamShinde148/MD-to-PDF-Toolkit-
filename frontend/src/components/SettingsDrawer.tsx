@@ -97,6 +97,28 @@ export const SettingsDrawer: React.FC = () => {
               </div>
 
               <div>
+                <label className="text-[10px] text-text-secondary block mb-1">Font Family</label>
+                <select
+                  value={exportSettings.fontFamily}
+                  onChange={(e) => updateExportSettings({ fontFamily: e.target.value })}
+                  className="w-full bg-bg-primary border border-border rounded-lg text-xs text-text-primary p-2 outline-none focus:border-accent-primary"
+                >
+                  <option value="Inter">Inter (Sans-serif)</option>
+                  <option value="Poppins">Poppins (Sans-serif)</option>
+                  <option value="Outfit">Outfit (Sans-serif)</option>
+                  <option value="Lora">Lora (Serif)</option>
+                  <option value="Merriweather">Merriweather (Serif)</option>
+                  <option value="Playfair Display">Playfair Display (Serif)</option>
+                  <option value="Fira Code">Fira Code (Monospace)</option>
+                  <option value="Noto Sans Devanagari">Noto Sans Devanagari (Marathi/Hindi)</option>
+                  <option value="Arial">Arial</option>
+                  <option value="Calibri">Calibri</option>
+                  <option value="Georgia">Georgia</option>
+                  <option value="Times New Roman">Times New Roman</option>
+                </select>
+              </div>
+
+              <div>
                 <label className="text-[10px] text-text-secondary block mb-1">Margins (L, T, R, B)</label>
                 <div className="grid grid-cols-4 gap-1.5 text-center">
                   {[0, 1, 2, 3].map(idx => {

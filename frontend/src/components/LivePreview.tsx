@@ -5,10 +5,21 @@ import hljs from 'highlight.js';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 
 export const LivePreview: React.FC = () => {
-  const { activeFile, customCss, workspaceLayout, setWorkspaceLayout } = useWorkspaceStore();
+  const { activeFile, customCss, workspaceLayout, setWorkspaceLayout, exportSettings } = useWorkspaceStore();
   const previewRef = useRef<HTMLDivElement>(null);
 
   if (!activeFile) return null;
+
+  const fontStyle = useMemo(() => {
+    const f = exportSettings.fontFamily;
+    if (['Lora', 'Merriweather', 'Playfair Display', 'Georgia', 'Times New Roman'].includes(f)) {
+      return { fontFamily: `"${f}", serif` };
+    }
+    if (f === 'Fira Code') {
+      return { fontFamily: `"${f}", monospace` };
+    }
+    return { fontFamily: `"${f}", sans-serif` };
+  }, [exportSettings.fontFamily]);
 
   // Custom Github-style Alerts post processing
   const renderedHtml = useMemo(() => {
@@ -93,6 +104,7 @@ export const LivePreview: React.FC = () => {
         <div className="w-full max-w-[820px] min-h-[1160px] bg-surface border border-border rounded-xl shadow-premium p-12 text-left relative transition-all duration-300">
           <div 
             className="preview-body markdown-body"
+            style={fontStyle}
             dangerouslySetInnerHTML={{ __html: renderedHtml }}
           />
         </div>

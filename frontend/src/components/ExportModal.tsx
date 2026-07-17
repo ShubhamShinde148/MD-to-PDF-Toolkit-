@@ -52,6 +52,7 @@ export const ExportModal: React.FC = () => {
           format: exportSettings.format,
           paper: exportSettings.paperSize,
           margins: exportSettings.margins,
+          font_family: exportSettings.fontFamily,
           css: customCss,
           cover: exportSettings.coverPage,
           cover_title: exportSettings.coverTitle,
