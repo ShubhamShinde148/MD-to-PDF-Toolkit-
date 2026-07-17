@@ -332,7 +332,7 @@ class CustomMarkdownPdf(MarkdownPdf):
             doc = fitz.Story.add_pdf_links(self.out_file, self.hrefs)
         except RuntimeError as e:
             print(f"Warning: Failed to add PDF links: {e}. Falling back to opening PDF without links.")
-            doc = fitz.open(self.out_file)
+            doc = fitz.open("pdf", self.out_file.getvalue())
         doc.set_metadata(self.meta)
         if self.toc_level > 0:
             doc.set_toc(self.toc)
