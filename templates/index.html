@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD to PDF & HTML Converter 🔍</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,700;1,400&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Noto+Sans+Devanagari:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;500;600;700&family=Rozha+One&family=Yatra+One&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Marked.js for markdown live parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Prism.js for code highlighting in live preview -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+</head>
+<body>
+    <div class="glass-bg"></div>
+    
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-glow"></div>
+                <i class="fa-solid fa-file-pdf brand-icon"></i>
+                <h1 data-i18n="logo_title">MD Catalyst <span>Pro</span></h1>
+            </div>
+            <p class="subtitle" data-i18n="subtitle">मराठी आणि इंग्रजी भाषेमध्ये Markdown चे सुंदर PDF आणि HTML मध्ये रुपांतर करा.</p>
+            
+            <div class="header-controls">
+                <div class="lang-selector">
+                    <button class="lang-btn active" data-lang="mix">Mix</button>
+                    <button class="lang-btn" data-lang="marathi">मराठी</button>
+                    <button class="lang-btn" data-lang="eng">Eng</button>
+                </div>
+                <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Mode Switcher -->
+        <div class="mode-selector">
+            <button class="mode-btn active" id="mode-md" data-i18n="mode_md"><i class="fa-solid fa-file-markdown"></i> Markdown Converter</button>
+            <button class="mode-btn" id="mode-pdf" data-i18n="mode_pdf"><i class="fa-solid fa-file-pdf"></i> PDF to HTML Converter</button>
+        </div>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <!-- Left Workspace: Editor & Upload -->
+            <section class="editor-pane">
+                <div class="pane-header">
+                    <div class="header-tabs">
+                        <button class="tab-btn active" id="tab-write" data-i18n="tab_write"><i class="fa-solid fa-pen-nib"></i> लिहा (Write)</button>
+                        <button class="tab-btn" id="tab-upload" data-i18n="tab_upload"><i class="fa-solid fa-cloud-arrow-up"></i> अपलोड (Upload)</button>
+                    </div>
+                </div>
+                
+                <div class="pane-content-wrapper">
+                    <!-- Write Tab Content -->
+                    <div class="tab-content" id="write-content">
+                        <!-- Formatting Toolbar -->
+                        <div class="editor-toolbar">
+                            <button class="toolbar-btn" data-action="bold" title="Bold (ठळक) [**]"><i class="fa-solid fa-bold"></i></button>
+                            <button class="toolbar-btn" data-action="italic" title="Italic (तिरपे) [*]"><i class="fa-solid fa-italic"></i></button>
+                            <button class="toolbar-btn" data-action="header" title="Heading (शीर्षक) [#]"><i class="fa-solid fa-heading"></i></button>
+                            <div class="toolbar-divider"></div>
+                            <button class="toolbar-btn" data-action="link" title="Link (लिंक) [[]()]"><i class="fa-solid fa-link"></i></button>
+                            <button class="toolbar-btn" data-action="code" title="Code Block (कोड ब्लॉक)"><i class="fa-solid fa-code"></i></button>
+                            <button class="toolbar-btn" data-action="table" title="Table (कोष्टक)"><i class="fa-solid fa-table"></i></button>
+                            <div class="toolbar-divider"></div>
+                            <button class="toolbar-btn" data-action="ul" title="Bullet List (यादी)"><i class="fa-solid fa-list-ul"></i></button>
+                            <button class="toolbar-btn" data-action="ol" title="Numbered List (क्रमांक यादी)"><i class="fa-solid fa-list-ol"></i></button>
+                            <div class="toolbar-divider"></div>
+                            <button class="toolbar-btn alert-inserter-trigger" id="alert-trigger" title="Alert callout (सूचना)"><i class="fa-solid fa-circle-exclamation"></i>
+                                <div class="alert-dropdown" id="alert-dropdown-menu">
+                                    <div class="alert-option" data-alert="note"><span class="badge badge-note">NOTE</span> साधी टीप</div>
+                                    <div class="alert-option" data-alert="tip"><span class="badge badge-tip">TIP</span> उपयुक्त टीप (हिरवा)</div>
+                                    <div class="alert-option" data-alert="important"><span class="badge badge-important">IMPORTANT</span> महत्त्वाचे (जांभळा)</div>
+                                    <div class="alert-option" data-alert="warning"><span class="badge badge-warning">WARNING</span> इशारा (पिवळा)</div>
+                                    <div class="alert-option" data-alert="caution"><span class="badge badge-caution">CAUTION</span> काळजी घ्या (लाल)</div>
+                                </div>
+                            </button>
+                            <div class="toolbar-divider"></div>
+                            <button class="toolbar-btn btn-danger" id="clear-btn" title="Clear Editor" data-i18n="clear_btn_title"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+
+                        <!-- Editor Textarea -->
+                        <div class="textarea-container">
+                            <textarea id="markdown-input" spellcheck="false" placeholder="येथे लिहिण्यास प्रारंभ करा..."></textarea>
+                        </div>
+
+                        <!-- Editor Status Bar -->
+                        <div class="editor-status-bar">
+                            <span id="word-count" data-i18n="word_count"><i class="fa-solid fa-align-left"></i> शब्द: 0</span>
+                            <span id="char-count" data-i18n="char_count"><i class="fa-solid fa-font"></i> अक्षरे: 0</span>
+                        </div>
+                    </div>
+
+                    <!-- Upload Tab Content -->
+                    <div class="tab-content hidden" id="upload-content">
+                        <div class="drag-drop-zone" id="drop-zone">
+                            <div class="upload-icon-container">
+                                <i class="fa-solid fa-file-lines upload-icon"></i>
+                            </div>
+                            <h3 data-i18n="md_upload_h3">Markdown फाईल ड्रॅग करा किंवा निवडा</h3>
+                            <p>फक्त .md फाईल्स सपोर्टेड आहेत</p>
+                            <input type="file" id="file-input" accept=".md" class="hidden">
+                            <button class="btn btn-secondary" id="browse-btn" data-i18n="browse_btn"><i class="fa-solid fa-folder-open"></i> फाइल शोधा</button>
+                        </div>
+                    </div>
+
+                    <!-- PDF Convert Tab Content -->
+                    <div class="tab-content hidden" id="pdf-convert-content">
+                        <div class="drag-drop-zone" id="pdf-drop-zone">
+                            <div class="upload-icon-container">
+                                <i class="fa-solid fa-file-pdf upload-icon" style="color: #ef4444;"></i>
+                            </div>
+                            <h3 data-i18n="pdf_upload_h3">PDF फाईल ड्रॅग करा किंवा निवडा</h3>
+                            <p>फक्त .pdf फाईल्स सपोर्टेड आहेत</p>
+                            <input type="file" id="pdf-file-input" accept=".pdf" class="hidden">
+                            <button class="btn btn-secondary" id="pdf-browse-btn" data-i18n="browse_btn"><i class="fa-solid fa-folder-open"></i> फाइल शोधा</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Workspace: Preview -->
+            <section class="preview-pane">
+                <div class="pane-header">
+                    <span class="preview-title"><i class="fa-solid fa-square-poll-horizontal"></i> लाईव्ह प्रिव्ह्यू (Live Preview)</span>
+                </div>
+                <div class="pane-content markdown-body" id="preview-output">
+                    <!-- Live HTML preview rendered here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer Control Bar -->
+        <footer class="control-bar">
+            <div class="settings-grid">
+                <!-- Export Format -->
+                <div class="setting-item">
+                    <label for="export-format" data-i18n="format_label"><i class="fa-solid fa-file-export"></i> फॉरमॅट (Format)</label>
+                    <select id="export-format">
+                        <option value="pdf">PDF दस्तऐवज (.pdf)</option>
+                        <option value="html">Styled वेबपेज (.html)</option>
+                    </select>
+                </div>
+
+                <!-- Paper Size -->
+                <div class="setting-item" id="paper-size-container">
+                    <label for="paper-size" data-i18n="paper_size_label"><i class="fa-solid fa-maximize"></i> पेपर साईझ (Paper Size)</label>
+                    <select id="paper-size">
+                        <option value="A4">A4 (Standard)</option>
+                        <option value="Letter">Letter (US)</option>
+                        <option value="A3">A3 (Large)</option>
+                        <option value="A5">A5 (Small)</option>
+                    </select>
+                </div>
+
+                <!-- Margins -->
+                <div class="setting-item" id="margins-container">
+                    <label data-i18n="margins_label"><i class="fa-solid fa-border-all"></i> मार्जिन्स (Margins - L, T, R, B)</label>
+                    <div class="margin-inputs">
+                        <div class="margin-input-box">
+                            <span class="margin-label">L</span>
+                            <input type="number" id="margin-left" value="36" title="Left margin in pt">
+                        </div>
+                        <div class="margin-input-box">
+                            <span class="margin-label">T</span>
+                            <input type="number" id="margin-top" value="36" title="Top margin in pt">
+                        </div>
+                        <div class="margin-input-box">
+                            <span class="margin-label">R</span>
+                            <input type="number" id="margin-right" value="-36" title="Right margin in pt">
+                        </div>
+                        <div class="margin-input-box">
+                            <span class="margin-label">B</span>
+                            <input type="number" id="margin-bottom" value="-36" title="Bottom margin in pt">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Font/Devanagari Settings -->
+                <div class="setting-item">
+                    <label for="font-family-select" data-i18n="font_family_label"><i class="fa-solid fa-font"></i> फॉन्ट (Font Family)</label>
+                    <select id="font-family-select">
+                        <optgroup label="मराठी (Marathi / Devanagari)">
+                            <option value="font-noto-sans-devanagari">Noto Sans Devanagari</option>
+                            <option value="font-poppins">Poppins</option>
+                            <option value="font-yatra-one">Yatra One (Decorative)</option>
+                            <option value="font-rozha-one">Rozha One (Serif)</option>
+                            <option value="font-nirmala" selected>Nirmala UI / Mangal</option>
+                        </optgroup>
+                        <optgroup label="दस्तऐवज / अहवाल (Documentation Style)">
+                            <option value="font-times">Times New Roman (Academic Serif)</option>
+                            <option value="font-georgia">Georgia (Editorial Serif)</option>
+                            <option value="font-calibri">Calibri (Business Sans)</option>
+                            <option value="font-arial">Arial (Formal Sans)</option>
+                            <option value="font-lora">Lora (Premium Serif)</option>
+                            <option value="font-merriweather">Merriweather (Screen Serif)</option>
+                        </optgroup>
+                        <optgroup label="इंग्रजी (English / Latin)">
+                            <option value="font-inter">Inter</option>
+                            <option value="font-outfit">Outfit</option>
+                            <option value="font-playfair">Playfair Display</option>
+                            <option value="font-fira-code">Fira Code (Mono)</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Additional Premium PDF Settings -->
+            <div class="settings-grid pdf-extra-settings">
+                <div class="setting-item checkbox-item">
+                    <label for="cover-page-toggle" data-i18n="cover_page_label"><i class="fa-solid fa-book-open"></i> कव्हर पेज (Cover Page)</label>
+                    <div class="checkbox-wrapper" style="display: flex; align-items: center; gap: 0.5rem; height: 42px;">
+                        <input type="checkbox" id="cover-page-toggle" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent-cyan);">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary);" data-i18n="cover_page_span">कव्हर पेज समाविष्ट करा</span>
+                    </div>
+                </div>
+
+                <div class="setting-item checkbox-item" id="page-numbers-container">
+                    <label for="page-numbers-toggle" data-i18n="page_numbers_label"><i class="fa-solid fa-hashtag"></i> पान क्रमांक (Page Numbers)</label>
+                    <div class="checkbox-wrapper" style="display: flex; align-items: center; gap: 0.5rem; height: 42px;">
+                        <input type="checkbox" id="page-numbers-toggle" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent-cyan);">
+                        <span style="font-size: 0.85rem; color: var(--text-secondary);" data-i18n="page_numbers_span">पान क्रमांक दर्शवा</span>
+                    </div>
+                </div>
+                
+                <div class="setting-item hidden" id="cover-title-container">
+                    <label for="cover-title-input" data-i18n="cover_title_label"><i class="fa-solid fa-heading"></i> कव्हर शीर्षक (Title)</label>
+                    <input type="text" id="cover-title-input" placeholder="उदा. प्रोजेक्ट रिपोर्ट">
+                </div>
+
+                <div class="setting-item hidden" id="cover-subtitle-container">
+                    <label for="cover-subtitle-input" data-i18n="cover_subtitle_label"><i class="fa-solid fa-paragraph"></i> कव्हर उप-शीर्षक (Subtitle)</label>
+                    <input type="text" id="cover-subtitle-input" placeholder="उदा. विभाग २१">
+                </div>
+
+                <div class="setting-item" id="watermark-container">
+                    <label for="watermark-input-field" data-i18n="watermark_label"><i class="fa-solid fa-stamp"></i> वॉटरमार्क (Watermark Text)</label>
+                    <input type="text" id="watermark-input-field" placeholder="उदा. CONFIDENTIAL">
+                </div>
+            </div>
+
+            <!-- Custom CSS & Download Row -->
+            <div class="control-footer">
+                <!-- Custom CSS Toggle -->
+                <div class="css-toggle-area">
+                    <button class="btn btn-css" id="toggle-css-btn" data-i18n="custom_css_btn"><i class="fa-solid fa-code"></i> Custom CSS</button>
+                    <div class="css-editor-container hidden" id="css-container">
+                        <textarea id="custom-css-input" spellcheck="false" placeholder="/* Custom CSS overrides here. Example: */
+body {
+    background-color: #ffffff;
+}"></textarea>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons" style="display: flex; gap: 0.8rem;">
+                    <button class="btn btn-secondary" id="print-btn" data-i18n="print_btn">
+                        <i class="fa-solid fa-print"></i> प्रिंट (Print)
+                    </button>
+                    <button class="btn btn-primary" id="convert-btn">
+                        <i class="fa-solid fa-circle-arrow-down"></i> कन्व्हर्ट आणि डाउनलोड
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Style Selection Modal -->
+    <div id="style-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-i18n="modal_title"><i class="fa-solid fa-palette"></i> PDF ची शैली निवडा (Select PDF Style)</h3>
+                <button class="close-modal-btn" id="close-style-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p data-i18n="modal_p">तुम्हाला डाऊनलोड करण्यासाठी कोणत्या प्रकारची पीडीएफ हवी आहे?</p>
+                <div class="style-options">
+                    <button class="style-opt-btn" id="opt-simple-pdf">
+                        <i class="fa-solid fa-file-lines style-icon simple-icon"></i>
+                        <h4 data-i18n="simple_pdf_title">साधी PDF (Simple PDF)</h4>
+                        <p data-i18n="simple_pdf_p">अधिकृत कामासाठी ब्लॅक-अँड-व्हाईट आणि साधी मांडणी.</p>
+                    </button>
+                    <button class="style-opt-btn" id="opt-colorful-pdf">
+                        <i class="fa-solid fa-file-pdf style-icon colorful-icon" style="color: #a855f7;"></i>
+                        <h4 data-i18n="colorful_pdf_title">रंगीत PDF (Colorful PDF)</h4>
+                        <p data-i18n="colorful_pdf_p">सूचना बॉक्सेस (Alerts) आणि रंगीत कोड हायलाइटिंगसह प्रीमियम मांडणी.</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Script Entry -->
+    <script src="/static/script.js"></script>
+</body>
+</html>
