@@ -325,6 +325,16 @@ class CustomMarkdownPdf(MarkdownPdf):
         self.sections.append(section)
         return html
 
+    def _make_doc(self):
+        self.writer.write(self.out_file)
+        self.writer.close()
+        try:
+            doc = fitz.Story.add_pdf_links(self.out_file, self.hrefs)
+        except RuntimeError as e:
+            print(f"Warning: Failed to add PDF links: {e}. Falling back to opening PDF without links.")
+            doc = fitz.open(self.out_file)
+        return doc
+
     def save(self, file_name, watermark_text=None, has_cover_page=False, show_page_numbers=True):
         """Build and post-process PDF with headers, footers, page numbers and watermarks."""
         doc = self._make_doc()
