@@ -110,7 +110,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   aiOpen: false,
   exportModalOpen: false,
   
-  theme: 'dark',
+  theme: 'light',
   language: 'mix',
   customCss: '',
   
